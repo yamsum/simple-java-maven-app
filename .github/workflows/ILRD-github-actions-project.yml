@@ -39,12 +39,14 @@ jobs:
           docker push yaafsome/java-maven-fork:${{ env.VERSION }}
 
       - name: Deploy to Local Docker
-        uses: garygrossgarten/github-action-ssh@0.8.0
+        uses: appleboy/ssh-action@v1.2.0
         with:
-          command: |
-            docker pull yaafsome/java-maven-fork:${{ env.VERSION }}
-            docker stop github-app && docker rm github-app
-            docker run --name github-app -p 8080 yaafsome/java-maven-fork:${{ env.VERSION }}
           host: ${{ secrets.HOST_ADDR }}
           username: yaaf
           password: ${{ secrets.HOST_PASS }}
+          port: 22
+          script: |
+            docker pull yaafsome/java-maven-fork:${{ env.VERSION }}
+            docker stop github-app && docker rm github-app
+            docker run --name github-app -p 8080 yaafsome/java-maven-fork:${{ env.VERSION }}
+          
