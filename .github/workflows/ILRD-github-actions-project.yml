@@ -38,10 +38,16 @@ jobs:
           docker build -t yaafsome/java-maven-fork:${{ env.VERSION }} --build-arg VERSION=${{ env.VERSION }} .
           docker push yaafsome/java-maven-fork:${{ env.VERSION }}
 
-      - name: Deploy to Staging server
-        run: |
-          ssh -i ${{ secrets.HOST_KEY }} -o "StrictHostKeyChecking no" ec2-user@${{ secrets.HOST_ADDR }}
-          docker pull yaafsome/java-maven-fork:${{ env.VERSION }}
-          docker stop github-app && docker rm github-app
-          docker run --name github-app yaafsome/java-maven-fork:${{ env.VERSION }}
+      - run: cat ${{ | ssh b@B 'cat >> .ssh/authorized_keys'
+      - name: ls -a via ssh
+        uses: fifsky/ssh-action@master
+        with:
+          command: |
+            docker pull yaafsome/java-maven-fork:${{ env.VERSION }}
+            docker stop github-app && docker rm github-app
+            docker run --name github-app yaafsome/java-maven-fork:${{ env.VERSION }}
+          host: ${{ secrets.HOST_ADDR }}
+          user: ec2-user
+          key: ${{ secrets.HOST_KEY }}
+
           
