@@ -39,13 +39,9 @@ jobs:
           docker push yaafsome/java-maven-fork:${{ env.VERSION }}
 
       - name: Deploy to Staging server
-        uses: easingthemes/ssh-deploy@v5.1.0
-        with:
-          SSH_PRIVATE_KEY: ${{ secrets.HOST_KEY }}
-          REMOTE_HOST: ${{ secrets.HOST_ADDR }}
-          REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          SCRIPT_BEFORE: |
-            docker pull yaafsome/java-maven-fork:${{ env.VERSION }}
-            docker stop github-app && docker rm github-app
-            docker run --name github-app yaafsome/java-maven-fork:${{ env.VERSION }}
+        run: |
+          ssh -i ${{ secrets.HOST_KEY }} -o "StrictHostKeyChecking no" ec2-user@${{ secrets.HOST_ADDR }}
+          docker pull yaafsome/java-maven-fork:${{ env.VERSION }}
+          docker stop github-app && docker rm github-app
+          docker run --name github-app yaafsome/java-maven-fork:${{ env.VERSION }}
           
