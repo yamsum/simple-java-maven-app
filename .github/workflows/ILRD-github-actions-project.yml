@@ -38,15 +38,13 @@ jobs:
           docker build -t yaafsome/java-maven-fork:${{ env.VERSION }} --build-arg VERSION=${{ env.VERSION }} .
           docker push yaafsome/java-maven-fork:${{ env.VERSION }}
 
-      - name: Deploy to Local Docker
-        uses: appleboy/ssh-action@v1.2.0
+      - name: Deploy to Staging server
+        uses: easingthemes/ssh-deploy@v5.1.0
         with:
-          host: ${{ secrets.HOST_ADDR }}
-          username: ec2-user
-          password: ${{ secrets.HOST_KEY }}
-          script: |
-            mkdir -p ~/.ssh
-            ssh-keyscan -H ${{ secrets.HOST_ADDR }} >> ~/.ssh/known_hosts
+          SSH_PRIVATE_KEY: ${{ secrets.HOST_KEY }}
+          REMOTE_HOST: ${{ secrets.HOST_ADDR }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          SCRIPT_BEFORE: |
             docker pull yaafsome/java-maven-fork:${{ env.VERSION }}
             docker stop github-app && docker rm github-app
             docker run --name github-app yaafsome/java-maven-fork:${{ env.VERSION }}
