@@ -42,13 +42,12 @@ jobs:
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.HOST_ADDR }}
-          username: yaaf
-          password: ${{ secrets.HOST_PASS }}
-          port: 22
+          username: ec2-user
+          password: ${{ secrets.HOST_KEY }}
           script: |
             mkdir -p ~/.ssh
             ssh-keyscan -H ${{ secrets.HOST_ADDR }} >> ~/.ssh/known_hosts
             docker pull yaafsome/java-maven-fork:${{ env.VERSION }}
             docker stop github-app && docker rm github-app
-            docker run --name github-app -p 8080 yaafsome/java-maven-fork:${{ env.VERSION }}
+            docker run --name github-app yaafsome/java-maven-fork:${{ env.VERSION }}
           
