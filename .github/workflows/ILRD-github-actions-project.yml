@@ -36,4 +36,15 @@ jobs:
       - name: Build Docker Image
         run: |
           docker build -t yaafsome/java-maven-fork:${{ env.VERSION }} --build-arg VERSION=${{ env.VERSION }} .
-          docker push yaafsome/java-maven-fork:${{ env.VERSION }} 
+          docker push yaafsome/java-maven-fork:${{ env.VERSION }}
+
+      - name: Deploy to Local Docker
+        uses: garygrossgarten/github-action-ssh@0.8.0
+        with:
+          command: |
+            docker pull yaafsome/java-maven-fork:${{ env.VERSION }}
+            docker stop github-app && docker rm github-app
+            docker run --name github-app -p 8080 yaafsome/java-maven-fork:${{ env.VERSION }}
+          host: ${{ secrets.HOST_ADDR }}
+          username: yaaf
+          password: ${{ secrets.HOST_PASS }}
